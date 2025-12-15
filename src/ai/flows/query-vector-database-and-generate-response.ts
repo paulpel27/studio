@@ -13,8 +13,7 @@ import {z} from 'genkit';
 
 const QueryVectorDatabaseAndGenerateResponseInputSchema = z.object({
   query: z.string().describe('The user query to be answered using the vector database.'),
-  apiKey: z.string().describe('The Google AI API key.'),
-  modelName: z.string().describe('The Google AI model name.'),
+  fileContents: z.array(z.string()).describe('An array of file contents to use as context.'),
 });
 export type QueryVectorDatabaseAndGenerateResponseInput = z.infer<typeof QueryVectorDatabaseAndGenerateResponseInputSchema>;
 
@@ -27,20 +26,6 @@ export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorD
   return queryVectorDatabaseAndGenerateResponseFlow(input);
 }
 
-const queryVectorDatabaseAndGenerateResponsePrompt = ai.definePrompt({
-  name: 'queryVectorDatabaseAndGenerateResponsePrompt',
-  input: {schema: QueryVectorDatabaseAndGenerateResponseInputSchema},
-  output: {schema: QueryVectorDatabaseAndGenerateResponseOutputSchema},
-  prompt: `You are a helpful AI assistant that answers questions based on the content of a vector database.
-
-  Answer the following question:
-  {{query}}`,
-  model: `{{{modelName}}}`,
-  config: {
-    apiKey: `{{{apiKey}}}`,
-  }
-});
-
 const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
   {
     name: 'queryVectorDatabaseAndGenerateResponseFlow',
@@ -48,7 +33,25 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
     outputSchema: QueryVectorDatabaseAndGenerateResponseOutputSchema,
   },
   async input => {
-    const {output} = await queryVectorDatabaseAndGenerateResponsePrompt(input);
-    return output!;
+    const {output} = await ai.generate({
+      prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
+
+      Use the following document excerpts as context to answer the question.
+      
+      Context:
+      ---
+      {{#each fileContents}}
+      {{this}}
+      ---
+      {{/each}}
+      
+      Question: {{query}}`,
+      context: {
+        fileContents: input.fileContents,
+        query: input.query,
+      },
+    });
+
+    return { response: output.text };
   }
 );

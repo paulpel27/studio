@@ -30,6 +30,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/api/genkit/:flow*',
+          destination: '/api/genkit',
+        },
+      ],
+    };
+  },
 };
 
 export default nextConfig;
