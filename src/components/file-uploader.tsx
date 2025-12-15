@@ -6,17 +6,30 @@ import { UploadCloud } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '@/lib/constants';
+import * as pdfjs from 'pdfjs-dist';
 
-// Mock function to simulate PDF text extraction
+// Configure the worker script path for pdf.js
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
 async function extractTextFromPdf(file: File): Promise<string> {
-  console.log(`Simulating text extraction for ${file.name}`);
-  // In a real app, you would use a library like pdf.js or a server-side process
-  // to extract text from the PDF file.
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(`This is simulated extracted text from the PDF file: "${file.name}".`);
-    }, 500);
-  });
+  const doc = await pdfjs.getDocument(URL.createObjectURL(file)).promise;
+  let fullText = '';
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const textContent = await page.getTextContent();
+    fullText += textContent.items.map(item => ('str' in item ? item.str : '')).join(' ') + '\n';
+  }
+
+  // Chunking logic
+  const chunkSize = 1000; // characters
+  const overlap = 200; // characters
+  const chunks = [];
+  for (let i = 0; i < fullText.length; i += chunkSize - overlap) {
+    const chunk = fullText.substring(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+  
+  return chunks.join('\n\n---CHUNK-SEPARATOR---\n\n');
 }
 
 export function FileUploader() {
@@ -51,10 +64,11 @@ export function FileUploader() {
           description: `"${file.name}" has been added to the knowledge base.`,
         });
       } catch (error) {
+        console.error('Extraction Failed:', error);
         toast({
             variant: 'destructive',
             title: 'Extraction Failed',
-            description: `Could not process "${file.name}".`,
+            description: `Could not process "${file.name}". The file might be corrupted or password-protected.`,
         });
       }
     }
