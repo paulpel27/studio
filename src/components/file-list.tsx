@@ -4,13 +4,23 @@ import { useAppContext } from '@/context/app-context';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, Trash2, Info } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function FileList() {
   const { state, dispatch } = useAppContext();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleDelete = (id: string) => {
     dispatch({ type: 'DELETE_FILE', payload: { id } });
   };
+
+  if (!isClient) {
+    return null; // or a loading skeleton
+  }
 
   if (state.files.length === 0) {
     return (
