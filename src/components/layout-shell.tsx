@@ -47,10 +47,10 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
                       }
                       tooltip={item.label}
                     >
-                      <>
+                      <div>
                         <item.icon />
                         <span>{item.label}</span>
-                      </>
+                      </div>
                     </SidebarMenuButton>
                   </Link>
                 </SidebarMenuItem>
