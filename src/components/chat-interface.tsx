@@ -23,37 +23,42 @@ const chatFormSchema = z.object({
 type ChatFormValues = z.infer<typeof chatFormSchema>;
 
 const Bot = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 8V4H8" />
-      <rect width="16" height="12" x="4" y="8" rx="2" />
-      <path d="M2 14h2" />
-      <path d="M20 14h2" />
-      <path d="M15 13v2" />
-      <path d="M9 13v2" />
-    </svg>
-  );
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 8V4H8" />
+    <rect width="16" height="12" x="4" y="8" rx="2" />
+    <path d="M2 14h2" />
+    <path d="M20 14h2" />
+    <path d="M15 13v2" />
+    <path d="M9 13v2" />
+  </svg>
+);
 
 export function ChatInterface() {
   const { state, dispatch } = useAppContext();
   const { toast } = useToast();
   const [isResponding, setIsResponding] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<ChatFormValues>({
     resolver: zodResolver(chatFormSchema),
     defaultValues: { prompt: '' },
   });
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -120,7 +125,7 @@ export function ChatInterface() {
     <div className="flex h-full flex-1 flex-col">
       <ScrollArea className="flex-1" ref={scrollAreaRef}>
         <div className="p-4 md:p-6">
-          {state.chats.length === 0 && !isResponding && (
+          {isClient && state.chats.length === 0 && !isResponding && (
             <Card className="mx-auto max-w-2xl text-center">
               <div className="p-6">
                 <Bot className="mx-auto h-12 w-12 text-muted-foreground" />
@@ -132,7 +137,7 @@ export function ChatInterface() {
             </Card>
           )}
 
-          {state.files.length === 0 && (
+          {isClient && state.files.length === 0 && (
              <Alert variant="destructive" className="mx-auto max-w-2xl my-4">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>No Files Uploaded</AlertTitle>
@@ -143,7 +148,7 @@ export function ChatInterface() {
           )}
 
           <div className="space-y-6">
-            {state.chats.map((chat) => (
+            {isClient && state.chats.map((chat) => (
               <div key={chat.id}>
                 {/* User Message */}
                 <div className="flex items-start gap-4 justify-end">
