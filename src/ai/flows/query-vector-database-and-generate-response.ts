@@ -24,6 +24,29 @@ const QueryVectorDatabaseAndGenerateResponseOutputSchema = z.object({
 });
 export type QueryVectorDatabaseAndGenerateResponseOutput = z.infer<typeof QueryVectorDatabaseAndGenerateResponseOutputSchema>;
 
+const qaPrompt = ai.definePrompt({
+    name: 'qaPrompt',
+    input: {
+        schema: z.object({
+            query: z.string(),
+            fileContents: z.array(z.string()),
+        })
+    },
+    prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
+
+    Use the following document excerpts as context to answer the question.
+    
+    Context:
+    ---
+    {{#each fileContents}}
+    {{this}}
+    ---
+    {{/each}}
+    
+    Question: {{query}}`,
+});
+
+
 export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorDatabaseAndGenerateResponseInput): Promise<QueryVectorDatabaseAndGenerateResponseOutput> {
   return queryVectorDatabaseAndGenerateResponseFlow(input);
 }
@@ -36,28 +59,20 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
   },
   async input => {
     const modelName = input.model.startsWith('googleai/') ? input.model : `googleai/${input.model}`;
-    const {output} = await ai.generate({
-      model: modelName,
-      config: {
-        apiKey: input.apiKey,
-      },
-      prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
-
-      Use the following document excerpts as context to answer the question.
-      
-      Context:
-      ---
-      {{#each fileContents}}
-      {{this}}
-      ---
-      {{/each}}
-      
-      Question: {{query}}`,
-      context: {
-        fileContents: input.fileContents,
-        query: input.query,
-      },
+    const { output } = await ai.run(qaPrompt, {
+        input: {
+            query: input.query,
+            fileContents: input.fileContents,
+        },
+        model: modelName,
+        config: {
+            apiKey: input.apiKey,
+        },
     });
+
+    if (!output) {
+        throw new Error('AI failed to generate a response.');
+    }
 
     return { response: output.text };
   }
