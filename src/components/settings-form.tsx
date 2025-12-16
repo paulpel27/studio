@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud } from 'lucide-react';
+import { decrypt } from '@/lib/crypto';
 
 const settingsSchema = z.object({
   apiKey: z.string().min(1, 'API Key is required.'),
@@ -28,32 +29,43 @@ export function SettingsForm() {
     defaultValues: state.settings,
   });
 
+  useEffect(() => {
+    form.reset(state.settings);
+  }, [state.settings, form]);
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           try {
             const text = e.target?.result as string;
             const newSettings = JSON.parse(text);
-            if (newSettings.apiKey && newSettings.model) {
-              const validatedSettings = settingsSchema.parse(newSettings);
-              form.reset(validatedSettings);
-              dispatch({ type: 'UPDATE_SETTINGS', payload: validatedSettings });
-              toast({
-                title: 'Settings Loaded',
-                description: 'Your settings have been loaded from the file.',
-              });
-            } else {
-              throw new Error('Invalid settings file format.');
+            
+            // Decrypt the API key if it's present
+            if (newSettings.apiKey) {
+                try {
+                    newSettings.apiKey = await decrypt(newSettings.apiKey);
+                } catch (e) {
+                    // It might not be encrypted, so we use it as is.
+                }
             }
+
+            const validatedSettings = settingsSchema.parse(newSettings);
+            form.reset(validatedSettings);
+            dispatch({ type: 'UPDATE_SETTINGS', payload: validatedSettings });
+            toast({
+              title: 'Settings Loaded',
+              description: 'Your settings have been loaded from the file.',
+            });
+
           } catch (error) {
             toast({
               variant: 'destructive',
               title: 'Invalid File',
               description:
-                'The uploaded file is not a valid JSON settings file.',
+                'The uploaded file is not a valid JSON settings file or is corrupted.',
             });
           }
         };

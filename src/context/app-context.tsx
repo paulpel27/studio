@@ -3,6 +3,7 @@
 import React, { createContext, useReducer, useContext, useEffect, type Dispatch } from 'react';
 import type { AppFile, Chat, AppSettings } from '@/lib/types';
 import { DEFAULT_MODEL } from '@/lib/constants';
+import { encrypt, decrypt } from '@/lib/crypto';
 
 interface AppState {
   files: AppFile[];
@@ -15,7 +16,8 @@ type Action =
   | { type: 'DELETE_FILE'; payload: { id: string } }
   | { type: 'ADD_CHAT'; payload: Chat }
   | { type: 'DELETE_CHAT'; payload: { id: string } }
-  | { type: 'UPDATE_SETTINGS'; payload: AppSettings };
+  | { type: 'UPDATE_SETTINGS'; payload: AppSettings }
+  | { type: 'SET_STATE'; payload: AppState };
 
 const AppContext = createContext<{ state: AppState; dispatch: Dispatch<Action> } | undefined>(undefined);
 
@@ -31,45 +33,69 @@ const appReducer = (state: AppState, action: Action): AppState => {
       return { ...state, chats: state.chats.filter(chat => chat.id !== action.payload.id) };
     case 'UPDATE_SETTINGS':
       return { ...state, settings: action.payload };
+    case 'SET_STATE':
+        return action.payload;
     default:
       return state;
   }
 };
 
 const getInitialState = (): AppState => {
-  if (typeof window === 'undefined') {
-    return {
-      files: [],
-      chats: [],
-      settings: { apiKey: '', model: DEFAULT_MODEL },
-    };
-  }
-  try {
-    const item = window.localStorage.getItem('raginfo-state');
-    return item ? JSON.parse(item) : {
-      files: [],
-      chats: [],
-      settings: { apiKey: '', model: DEFAULT_MODEL },
-    };
-  } catch (error) {
-    console.error('Error reading from localStorage', error);
-    return {
-      files: [],
-      chats: [],
-      settings: { apiKey: '', model: DEFAULT_MODEL },
-    };
-  }
+  return {
+    files: [],
+    chats: [],
+    settings: { apiKey: '', model: DEFAULT_MODEL },
+  };
 };
-
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(appReducer, getInitialState());
 
+  // Load state from localStorage on initial mount
   useEffect(() => {
-    try {
-      window.localStorage.setItem('raginfo-state', JSON.stringify(state));
-    } catch (error) {
-      console.error('Error writing to localStorage', error);
+    if (typeof window !== 'undefined') {
+      try {
+        const item = window.localStorage.getItem('raginfo-state');
+        if (item) {
+          const parsedState = JSON.parse(item) as AppState;
+          // Decrypt the API key after loading
+          if (parsedState.settings.apiKey) {
+            decrypt(parsedState.settings.apiKey).then(decryptedKey => {
+              parsedState.settings.apiKey = decryptedKey;
+              dispatch({ type: 'SET_STATE', payload: parsedState });
+            });
+          } else {
+             dispatch({ type: 'SET_STATE', payload: parsedState });
+          }
+        }
+      } catch (error) {
+        console.error('Error reading from localStorage', error);
+      }
+    }
+  }, []);
+
+  // Save state to localStorage on change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Don't save initial empty state
+      if (state.files.length === 0 && state.chats.length === 0 && !state.settings.apiKey) {
+        return;
+      }
+      // Encrypt the API key before saving
+      encrypt(state.settings.apiKey).then(encryptedKey => {
+        const stateToSave = {
+          ...state,
+          settings: {
+            ...state.settings,
+            apiKey: encryptedKey,
+          },
+        };
+        try {
+          window.localStorage.setItem('raginfo-state', JSON.stringify(stateToSave));
+        } catch (error) {
+          console.error('Error writing to localStorage', error);
+        }
+      });
     }
   }, [state]);
 
