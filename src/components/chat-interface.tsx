@@ -98,6 +98,7 @@ export function ChatInterface() {
         query: data.prompt,
         fileContents,
         model: state.settings.model,
+        apiKey: state.settings.apiKey,
       });
 
       dispatch({

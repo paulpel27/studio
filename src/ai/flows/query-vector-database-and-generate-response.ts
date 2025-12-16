@@ -15,6 +15,7 @@ const QueryVectorDatabaseAndGenerateResponseInputSchema = z.object({
   query: z.string().describe('The user query to be answered using the vector database.'),
   fileContents: z.array(z.string()).describe('An array of file contents to use as context.'),
   model: z.string().describe('The AI model to use for generating the response.'),
+  apiKey: z.string().describe('The Google AI API key.'),
 });
 export type QueryVectorDatabaseAndGenerateResponseInput = z.infer<typeof QueryVectorDatabaseAndGenerateResponseInputSchema>;
 
@@ -37,6 +38,9 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
     const modelName = input.model.startsWith('googleai/') ? input.model : `googleai/${input.model}`;
     const {output} = await ai.generate({
       model: modelName,
+      config: {
+        apiKey: input.apiKey,
+      },
       prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
       Use the following document excerpts as context to answer the question.
