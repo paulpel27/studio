@@ -13,8 +13,11 @@ import {
   SidebarMenuButton,
   SidebarInset,
   SidebarTrigger,
+  SidebarFooter,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { FileText, MessageSquare, Settings } from 'lucide-react';
+import { FileText, MessageSquare, Settings, HelpCircle } from 'lucide-react';
+import { HelpDialog } from './help-dialog';
 
 const Bot = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -79,6 +82,21 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
               ))}
             </SidebarMenu>
           </SidebarContent>
+          <SidebarFooter>
+            <SidebarSeparator />
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <HelpDialog>
+                        <SidebarMenuButton tooltip="Help">
+                            <div>
+                                <HelpCircle />
+                                <span>Help</span>
+                            </div>
+                        </SidebarMenuButton>
+                    </HelpDialog>
+                </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
         </Sidebar>
 
         <SidebarInset>
