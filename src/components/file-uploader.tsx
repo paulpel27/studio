@@ -13,23 +13,26 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 async function extractTextFromPdf(file: File): Promise<string> {
   const doc = await pdfjs.getDocument(URL.createObjectURL(file)).promise;
-  let fullText = '';
-  for (let i = 1; i <= doc.numPages; i++) {
+  const numPages = doc.numPages;
+  const allChunks: string[] = [];
+
+  const chunkSize = 1500; // characters
+  const chunkOverlap = 200; // characters
+
+  for (let i = 1; i <= numPages; i++) {
     const page = await doc.getPage(i);
     const textContent = await page.getTextContent();
-    fullText += textContent.items.map(item => ('str' in item ? item.str : '')).join(' ') + '\n';
-  }
+    const pageText = textContent.items.map(item => ('str' in item ? item.str : '')).join(' ');
+    
+    if (pageText.trim().length === 0) continue;
 
-  // Chunking logic
-  const chunkSize = 1000; // characters
-  const overlap = 200; // characters
-  const chunks = [];
-  for (let i = 0; i < fullText.length; i += chunkSize - overlap) {
-    const chunk = fullText.substring(i, i + chunkSize);
-    chunks.push(chunk);
+    for (let j = 0; j < pageText.length; j += chunkSize - chunkOverlap) {
+        const chunk = pageText.substring(j, j + chunkSize);
+        allChunks.push(chunk);
+    }
   }
   
-  return chunks.join('\n\n---CHUNK-SEPARATOR---\n\n');
+  return allChunks.join('\n\n');
 }
 
 export function FileUploader() {
