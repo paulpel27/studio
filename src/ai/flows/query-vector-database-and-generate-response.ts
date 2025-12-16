@@ -34,8 +34,9 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
     outputSchema: QueryVectorDatabaseAndGenerateResponseOutputSchema,
   },
   async input => {
+    const modelName = input.model.startsWith('googleai/') ? input.model : `googleai/${input.model}`;
     const {output} = await ai.generate({
-      model: input.model,
+      model: modelName,
       prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
       Use the following document excerpts as context to answer the question.
