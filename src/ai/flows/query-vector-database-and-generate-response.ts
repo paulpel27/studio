@@ -62,16 +62,18 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
   },
   async input => {
     const modelName = input.model.startsWith('googleai/') ? input.model : `googleai/${input.model}`;
-    const { output } = await ai.run(qaPrompt, {
-        input: {
+    const { output } = await qaPrompt(
+        {
             query: input.query,
             fileContents: input.fileContents,
         },
-        model: modelName,
-        config: {
-            apiKey: input.apiKey,
-        },
-    });
+        {
+            model: modelName,
+            config: {
+                apiKey: input.apiKey,
+            },
+        }
+    );
 
     if (!output) {
         throw new Error('AI failed to generate a response.');
