@@ -36,37 +36,26 @@ export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorD
     ],
   });
 
-  const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
-    {
-      name: 'queryVectorDatabaseAndGenerateResponseFlow',
-      inputSchema: QueryVectorDatabaseAndGenerateResponseInputSchema,
-      outputSchema: QueryVectorDatabaseAndGenerateResponseOutputSchema,
-    },
-    async (input) => {
-      const modelName = input.model.startsWith('gemini')
-        ? `googleai/${input.model}`
-        : `googleai/gemini-1.5-flash-latest`;
+  const modelName = input.model.startsWith('gemini')
+    ? `googleai/${input.model}`
+    : `googleai/gemini-1.5-flash-latest`;
 
-      const { output } = await ai.generate({
-        prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
+  const { output } = await ai.generate({
+    prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
-          Use the following document excerpts as context to answer the question. If the answer is not found in the excerpts, say "I could not find an answer in the provided documents." Do not make up information.
-          
-          Context:
-          ---
-          ${input.fileContents.join('\n---\n')}
-          
-          Question: ${input.query}`,
-        model: modelName,
-      });
+      Use the following document excerpts as context to answer the question. If the answer is not found in the excerpts, say "I could not find an answer in the provided documents." Do not make up information.
+      
+      Context:
+      ---
+      ${input.fileContents.join('\n---\n')}
+      
+      Question: ${input.query}`,
+    model: modelName,
+  });
 
-      if (!output || !output.text) {
-        throw new Error('AI failed to generate a response.');
-      }
+  if (!output || !output.text) {
+    throw new Error('AI failed to generate a response.');
+  }
 
-      return { response: output.text };
-    }
-  );
-
-  return queryVectorDatabaseAndGenerateResponseFlow(input);
+  return { response: output.text };
 }
