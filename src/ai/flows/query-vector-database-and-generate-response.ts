@@ -69,9 +69,6 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
         },
         {
             model: modelName,
-            config: {
-                apiKey: input.apiKey,
-            },
         }
     );
 
