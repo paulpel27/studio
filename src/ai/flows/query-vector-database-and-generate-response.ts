@@ -32,6 +32,9 @@ const qaPrompt = ai.definePrompt({
             fileContents: z.array(z.string()),
         })
     },
+    output: {
+        format: 'text'
+    },
     prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
     Use the following document excerpts as context to answer the question.
@@ -74,6 +77,6 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
         throw new Error('AI failed to generate a response.');
     }
 
-    return { response: output.text };
+    return { response: output };
   }
 );
