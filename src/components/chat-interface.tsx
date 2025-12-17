@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { queryVectorDatabaseAndGenerateResponse } from '@/ai/flows/query-vector-database-and-generate-response';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 
 const chatFormSchema = z.object({
@@ -52,7 +52,7 @@ export function ChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<ChatFormValues>({
-    resolver: zodResolver(chatFormSchema),
+    resolver: zodResolver(chatFormschema),
     defaultValues: { prompt: '' },
   });
 
