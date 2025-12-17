@@ -29,12 +29,17 @@ async function extractTextFromPdf(file: File): Promise<string> {
 
 function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200): string[] {
     const chunks: string[] = [];
+    if (!text) return chunks;
+
     let i = 0;
     while (i < text.length) {
       const end = i + chunkSize;
       chunks.push(text.slice(i, end));
+      // Move the starting point for the next chunk back by `overlap` characters
       i = end - overlap;
-      if (i < 0) i = 0;
+      if (end >= text.length) {
+        break;
+      }
     }
     return chunks;
 }
@@ -71,7 +76,10 @@ export function FileUploader() {
       try {
         const rawText = await extractTextFromPdf(file);
         const textChunks = chunkText(rawText);
-        const combinedText = textChunks.join('\n\n');
+        
+        // In this simplified RAG, we join chunks back together. 
+        // A more advanced implementation would handle chunks separately.
+        const combinedText = textChunks.join('\n\n---\n\n');
 
         dispatch({
           type: 'ADD_FILE',

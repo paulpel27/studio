@@ -37,7 +37,7 @@ const qaPrompt = ai.definePrompt({
     },
     prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
-    Use the following document excerpts as context to answer the question.
+    Use the following document excerpts as context to answer the question. If the answer is not found in the excerpts, say "I could not find an answer in the provided documents." Do not make up information.
     
     Context:
     ---

@@ -81,11 +81,11 @@ export function ChatInterface() {
   }
 
   async function onSubmit(data: ChatFormValues) {
-    if (!state.settings.apiKey) {
+    if (!state.settings.apiKey || !state.settings.model) {
       toast({
         variant: 'destructive',
-        title: 'API Key Missing',
-        description: 'Please enter your Google AI API key in the settings page.',
+        title: 'AI Configuration Missing',
+        description: 'Please enter your Google AI API key and model in the settings page.',
       });
       return;
     }
@@ -115,7 +115,7 @@ export function ChatInterface() {
       toast({
         variant: 'destructive',
         title: 'An Error Occurred',
-        description: 'Failed to get a response from the AI. Please check your API key and try again.',
+        description: 'Failed to get a response from the AI. Please check your API key and model, and try again.',
       });
     } finally {
       setIsResponding(false);
@@ -167,7 +167,7 @@ export function ChatInterface() {
                     <AvatarFallback>AI</AvatarFallback>
                   </Avatar>
                   <div className="group grid gap-1 rounded-lg bg-card px-3 py-2 shadow-md max-w-xl">
-                    <p className="text-sm">{chat.aiResponse}</p>
+                    <p className="text-sm" style={{ whiteSpace: 'pre-wrap' }}>{chat.aiResponse}</p>
                      <div className="mt-2 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopy(chat.aiResponse)}>
                         <Copy className="h-4 w-4" />
@@ -205,12 +205,12 @@ export function ChatInterface() {
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input placeholder="Ask a question..." {...field} disabled={isResponding} />
+                    <Input placeholder="Ask a question..." {...field} disabled={isResponding || (isClient && state.files.length === 0)} />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button type="submit" size="icon" disabled={isResponding}>
+            <Button type="submit" size="icon" disabled={isResponding || (isClient && state.files.length === 0)}>
               <Send className="h-4 w-4" />
             </Button>
           </form>
