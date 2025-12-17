@@ -1,9 +1,8 @@
 export interface AppFile {
   id: string;
   name: string;
-  // This is a placeholder for the content extracted from the PDF.
-  // In a real application, this would be the full text or structured data.
-  text: string;
+  // This holds the content extracted from the PDF, broken into chunks.
+  textChunks: string[];
 }
 
 export interface Chat {

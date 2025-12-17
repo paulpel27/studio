@@ -58,6 +58,15 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         const item = window.localStorage.getItem('raginfo-state');
         if (item) {
           const parsedState = JSON.parse(item) as AppState;
+          
+          // Data migration for old structure
+          if (parsedState.files && parsedState.files.length > 0 && (parsedState.files[0] as any).text) {
+              parsedState.files = parsedState.files.map(file => ({
+                  ...file,
+                  textChunks: (file as any).text ? chunkText((file as any).text) : [],
+              }));
+          }
+
           // Decrypt the API key after loading
           if (parsedState.settings.apiKey) {
             decrypt(parsedState.settings.apiKey).then(decryptedKey => {
@@ -91,7 +100,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           },
         };
         try {
-          window.localStorage.setItem('raginfo-state', JSON.stringify(stateToSave));
+          // Remove "text" property before saving if it exists
+          const sanitizedState = {
+            ...stateToSave,
+            files: stateToSave.files.map(({ text, ...rest }: any) => rest),
+          }
+          window.localStorage.setItem('raginfo-state', JSON.stringify(sanitizedState));
         } catch (error) {
           console.error('Error writing to localStorage', error);
         }
@@ -113,3 +127,20 @@ export const useAppContext = () => {
   }
   return context;
 };
+
+// Helper for data migration from old text property
+function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200): string[] {
+    const chunks: string[] = [];
+    if (!text) return chunks;
+
+    let i = 0;
+    while (i < text.length) {
+      const end = i + chunkSize;
+      chunks.push(text.slice(i, end));
+      i = end - overlap;
+      if (end >= text.length) {
+        break;
+      }
+    }
+    return chunks;
+}

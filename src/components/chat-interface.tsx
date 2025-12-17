@@ -93,7 +93,8 @@ export function ChatInterface() {
     setIsResponding(true);
 
     try {
-      const fileContents = state.files.map(file => file.text);
+      const fileContents = state.files.flatMap(file => file.textChunks);
+      
       const result = await queryVectorDatabaseAndGenerateResponse({
         query: data.prompt,
         fileContents,

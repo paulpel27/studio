@@ -93,13 +93,12 @@ export function FileUploader() {
 
     // 3. "Embedding" / Saving
     updateFileStatus(file.name, { status: 'embedding', progress: 50, message: 'Adding to knowledge base...' });
-    const combinedText = textChunks.join('\n\n---\n\n');
     dispatch({
       type: 'ADD_FILE',
       payload: {
         id: `${file.name}-${new Date().toISOString()}`,
         name: file.name,
-        text: combinedText,
+        textChunks: textChunks,
       },
     });
     await new Promise(resolve => setTimeout(resolve, 500));
