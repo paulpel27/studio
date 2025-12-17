@@ -56,12 +56,14 @@ const extractTextFromPdfFlowInternal = ai.defineFlow(
   async (input) => {
     const modelName = input.model.startsWith('googleai/') ? input.model : `googleai/${input.model}`;
     
-    const { output } = await ai.run(chunkingPrompt, {
-        input: { pdfBase64: input.pdfBase64 },
-        model: modelName,
-        config: { apiKey: input.apiKey },
-        output: { format: 'json' } 
-    });
+    const { output } = await chunkingPrompt(
+        { pdfBase64: input.pdfBase64 },
+        {
+            model: modelName,
+            config: { apiKey: input.apiKey },
+            output: { format: 'json' } 
+        }
+    );
 
     if (!output) {
       throw new Error('AI failed to generate a response for text extraction.');

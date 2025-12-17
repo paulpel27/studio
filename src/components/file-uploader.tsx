@@ -6,51 +6,39 @@ import { UploadCloud } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '@/lib/constants';
-import * as pdfjs from 'pdfjs-dist';
+import { extractTextFromPdfFlow } from '@/ai/flows/extract-text-from-pdf-flow';
 
-// Set up the worker for pdfjs
-if (typeof window !== 'undefined') {
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-        'pdfjs-dist/build/pdf.worker.min.mjs',
-        import.meta.url
-    ).toString();
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove the data URI prefix
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = (error) => reject(error);
+  });
 }
-
-async function extractTextFromPdf(file: File): Promise<string> {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjs.getDocument(arrayBuffer).promise;
-    let text = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        text += content.items.map(item => ('str' in item ? item.str : '')).join(' ');
-        text += '\n';
-    }
-    return text;
-}
-
-function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200): string[] {
-    const chunks: string[] = [];
-    let i = 0;
-    while (i < text.length) {
-        const end = i + chunkSize;
-        chunks.push(text.slice(i, end));
-        i = end - overlap;
-        if (i < 0) {
-            i = end;
-        }
-    }
-    return chunks;
-}
-
 
 export function FileUploader() {
-  const { dispatch } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setIsLoading(true);
+
+    if (!state.settings.apiKey) {
+      toast({
+        variant: 'destructive',
+        title: 'API Key Missing',
+        description: 'Please enter your Google AI API key in the settings page.',
+      });
+      setIsLoading(false);
+      return;
+    }
 
     for (const file of acceptedFiles) {
       if (file.size > MAX_FILE_SIZE_BYTES) {
@@ -63,9 +51,14 @@ export function FileUploader() {
       }
 
       try {
-        const extractedText = await extractTextFromPdf(file);
-        const textChunks = chunkText(extractedText);
-        const combinedText = textChunks.join('\n\n');
+        const pdfBase64 = await fileToBase64(file);
+        const result = await extractTextFromPdfFlow({
+          pdfBase64,
+          model: state.settings.model,
+          apiKey: state.settings.apiKey,
+        });
+        
+        const combinedText = result.chunks.join('\n\n');
 
         dispatch({
           type: 'ADD_FILE',
@@ -89,7 +82,7 @@ export function FileUploader() {
       }
     }
     setIsLoading(false);
-  }, [dispatch, toast]);
+  }, [dispatch, toast, state.settings]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
