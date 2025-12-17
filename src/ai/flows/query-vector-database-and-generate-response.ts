@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
 
 const QueryVectorDatabaseAndGenerateResponseInputSchema = z.object({
   query: z.string().describe('The user query to be answered using the vector database.'),
@@ -62,13 +61,11 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
     outputSchema: QueryVectorDatabaseAndGenerateResponseOutputSchema,
   },
   async input => {
-    // Dynamically create the Google AI plugin with the provided API key.
-    const dynamicGoogleAI = googleAI({ apiKey: input.apiKey });
-    const modelName = input.model.startsWith('gemini') ? input.model : `gemini-1.5-flash-latest`;
+    // Construct the full model name string for Genkit.
+    const modelName = input.model.startsWith('gemini') ? `googleai/${input.model}` : `googleai/gemini-1.5-flash-latest`;
 
     const { output } = await ai.generate({
-      prompt: {
-        text: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
+      prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
     
         Use the following document excerpts as context to answer the question. If the answer is not found in the excerpts, say "I could not find an answer in the provided documents." Do not make up information.
         
@@ -76,10 +73,11 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
         ---
         ${input.fileContents.join('\n---\n')}
         
-        Question: ${input.query}`
+        Question: ${input.query}`,
+      model: modelName,
+      config: {
+        apiKey: input.apiKey,
       },
-      model: dynamicGoogleAI.model(modelName),
-      stream: false,
     });
 
     if (!output || !output.text) {
