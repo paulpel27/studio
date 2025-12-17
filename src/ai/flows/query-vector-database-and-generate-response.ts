@@ -10,7 +10,7 @@
 
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import { z } from 'genkit/zod';
+import { z } from 'zod';
 
 const QueryVectorDatabaseAndGenerateResponseInputSchema = z.object({
   query: z.string().describe('The user query to be answered using the vector database.'),
