@@ -6,36 +6,50 @@ import { UploadCloud } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '@/lib/constants';
-import { extractTextFromPdfFlow } from '@/ai/flows/extract-text-from-pdf-flow';
+import * as pdfjs from 'pdfjs-dist';
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const result = reader.result as string;
-      // remove the data:application/pdf;base64, part
-      resolve(result.split(',')[1]);
-    };
-    reader.onerror = error => reject(error);
-  });
+// Set up the worker for pdfjs
+if (typeof window !== 'undefined') {
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url
+    ).toString();
 }
 
+async function extractTextFromPdf(file: File): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjs.getDocument(arrayBuffer).promise;
+    let text = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => ('str' in item ? item.str : '')).join(' ');
+        text += '\n';
+    }
+    return text;
+}
+
+function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200): string[] {
+    const chunks: string[] = [];
+    let i = 0;
+    while (i < text.length) {
+        const end = i + chunkSize;
+        chunks.push(text.slice(i, end));
+        i = end - overlap;
+        if (i < 0) {
+            i = end;
+        }
+    }
+    return chunks;
+}
+
+
 export function FileUploader() {
-  const { state, dispatch } = useAppContext();
+  const { dispatch } = useAppContext();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (!state.settings.apiKey) {
-      toast({
-        variant: 'destructive',
-        title: 'API Key Missing',
-        description: 'Please enter your Google AI API key in the settings page to process files.',
-      });
-      return;
-    }
-    
     setIsLoading(true);
 
     for (const file of acceptedFiles) {
@@ -49,38 +63,33 @@ export function FileUploader() {
       }
 
       try {
-        const pdfBase64 = await fileToBase64(file);
-        const { chunks } = await extractTextFromPdfFlow({
-          pdfBase64,
-          model: state.settings.model,
-          apiKey: state.settings.apiKey,
-        });
-
-        const extractedText = chunks.join('\n\n');
+        const extractedText = await extractTextFromPdf(file);
+        const textChunks = chunkText(extractedText);
+        const combinedText = textChunks.join('\n\n');
 
         dispatch({
           type: 'ADD_FILE',
           payload: {
             id: `${file.name}-${new Date().toISOString()}`,
             name: file.name,
-            text: extractedText,
+            text: combinedText,
           },
         });
         toast({
-          title: 'File Added',
-          description: `"${file.name}" has been processed and added to the knowledge base.`,
+          title: 'File Processed',
+          description: `"${file.name}" has been extracted and added to the knowledge base.`,
         });
       } catch (error) {
         console.error('Extraction Failed:', error);
         toast({
             variant: 'destructive',
             title: 'Extraction Failed',
-            description: `Could not process "${file.name}". The AI model failed to extract text. Please check your API key and model configuration.`,
+            description: `Could not process "${file.name}". Please ensure it is a valid PDF file.`,
         });
       }
     }
     setIsLoading(false);
-  }, [dispatch, toast, state.settings]);
+  }, [dispatch, toast]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -100,7 +109,7 @@ export function FileUploader() {
       {isLoading ? (
         <div className="flex flex-col items-center gap-2">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            <p className="text-muted-foreground">Processing files with AI...</p>
+            <p className="text-muted-foreground">Processing files...</p>
         </div>
       ) : (
         <div className="flex flex-col items-center text-center">
