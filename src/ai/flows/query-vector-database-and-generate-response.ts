@@ -38,7 +38,7 @@ export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorD
 
   const modelName = input.model.startsWith('gemini')
     ? `googleai/${input.model}`
-    : `googleai/gemini-1.5-flash-latest`;
+    : `googleai/gemini-pro`;
 
   const { output } = await ai.generate({
     prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
