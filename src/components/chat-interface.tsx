@@ -97,7 +97,7 @@ export function ChatInterface() {
       
       const result = await queryVectorDatabaseAndGenerateResponse({
         query: data.prompt,
-        fileContents,
+        fileContents: fileContents,
         model: state.settings.model,
         apiKey: state.settings.apiKey,
       });

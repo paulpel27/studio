@@ -10,8 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud } from 'lucide-react';
-import { decrypt } from '@/lib/crypto';
+import { UploadCloud, Download } from 'lucide-react';
+import { decrypt, encrypt } from '@/lib/crypto';
 
 const settingsSchema = z.object({
   apiKey: z.string().min(1, 'API Key is required.'),
@@ -81,6 +81,32 @@ export function SettingsForm() {
     multiple: false,
   });
 
+  async function handleExport() {
+    try {
+        const encryptedKey = await encrypt(state.settings.apiKey);
+        const settingsToSave = { ...state.settings, apiKey: encryptedKey };
+        const blob = new Blob([JSON.stringify(settingsToSave, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'raginfo-settings.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        toast({
+            title: 'Settings Exported',
+            description: 'Your settings have been saved to raginfo-settings.json',
+        });
+    } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Export Failed',
+            description: 'Could not export settings.',
+        });
+    }
+  }
+
   function onSubmit(data: SettingsFormValues) {
     dispatch({ type: 'UPDATE_SETTINGS', payload: data });
     toast({
@@ -107,7 +133,7 @@ export function SettingsForm() {
                   ? 'Drop the settings file here...'
                   : 'Drag & drop a settings file, or click to select'}
               </p>
-              <p className="text-xs text-muted-foreground">Upload a JSON file with your API key and model.</p>
+              <p className="text-xs text-muted-foreground">Upload a JSON file to import settings.</p>
             </div>
           </div>
 
@@ -138,7 +164,13 @@ export function SettingsForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit">Save Settings</Button>
+            <div className="flex flex-col sm:flex-row gap-2">
+                <Button type="submit" className="flex-1">Save Settings</Button>
+                <Button type="button" variant="outline" className="flex-1" onClick={handleExport}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Settings
+                </Button>
+            </div>
           </div>
         </div>
       </form>
