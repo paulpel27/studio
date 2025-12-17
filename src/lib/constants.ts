@@ -6,4 +6,4 @@ export const AVAILABLE_MODELS = [
   { value: 'gemini-pro', label: 'Gemini Pro' },
 ];
 
-export const DEFAULT_MODEL = 'gemini-pro';
+export const DEFAULT_MODEL = 'gemini-1.5-flash-latest';
