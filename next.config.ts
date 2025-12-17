@@ -30,9 +30,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverActions: {
-    bodySizeLimit: '15mb',
-  },
   async rewrites() {
     return {
       beforeFiles: [
