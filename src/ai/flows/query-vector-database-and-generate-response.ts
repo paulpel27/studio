@@ -25,7 +25,13 @@ export type QueryVectorDatabaseAndGenerateResponseOutput = z.infer<typeof QueryV
 
 
 export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorDatabaseAndGenerateResponseInput): Promise<QueryVectorDatabaseAndGenerateResponseOutput> {
-  const modelName = input.model || 'gemini-pro';
+  // The 'gemini-pro' model can be restrictive on the free tier.
+  // Automatically switch to a more generous model if 'gemini-pro' is selected.
+  let modelName = input.model || 'gemini-1.5-flash-latest';
+  if (modelName === 'gemini-pro') {
+    modelName = 'gemini-1.5-flash-latest';
+  }
+
 
   const prompt = `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
