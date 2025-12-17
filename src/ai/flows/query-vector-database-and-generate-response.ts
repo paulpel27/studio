@@ -24,32 +24,6 @@ const QueryVectorDatabaseAndGenerateResponseOutputSchema = z.object({
 });
 export type QueryVectorDatabaseAndGenerateResponseOutput = z.infer<typeof QueryVectorDatabaseAndGenerateResponseOutputSchema>;
 
-const qaPrompt = ai.definePrompt({
-    name: 'qaPrompt',
-    input: {
-        schema: z.object({
-            query: z.string(),
-            fileContents: z.array(z.string()),
-        })
-    },
-    output: {
-        format: 'text'
-    },
-    prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
-
-    Use the following document excerpts as context to answer the question. If the answer is not found in the excerpts, say "I could not find an answer in the provided documents." Do not make up information.
-    
-    Context:
-    ---
-    {{#each fileContents}}
-    {{this}}
-    ---
-    {{/each}}
-    
-    Question: {{query}}`,
-});
-
-
 export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorDatabaseAndGenerateResponseInput): Promise<QueryVectorDatabaseAndGenerateResponseOutput> {
   return queryVectorDatabaseAndGenerateResponseFlow(input);
 }
@@ -66,7 +40,7 @@ const queryVectorDatabaseAndGenerateResponseFlow = ai.defineFlow(
 
     const { output } = await ai.generate({
       prompt: `You are a helpful AI assistant that answers questions based on the provided document excerpts.
-    
+
         Use the following document excerpts as context to answer the question. If the answer is not found in the excerpts, say "I could not find an answer in the provided documents." Do not make up information.
         
         Context:
