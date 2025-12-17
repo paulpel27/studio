@@ -52,7 +52,7 @@ export function ChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<ChatFormValues>({
-    resolver: zodResolver(chatFormschema),
+    resolver: zodResolver(chatFormSchema),
     defaultValues: { prompt: '' },
   });
 
