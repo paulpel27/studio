@@ -1,15 +1,13 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for querying a vector database and generating a response.
+ * @fileOverview This file defines a flow for querying a vector database and generating a response.
  *
  * - queryVectorDatabaseAndGenerateResponse - A function that takes a user query and returns an AI-generated response based on the content of the vector database.
  * - QueryVectorDatabaseAndGenerateResponseInput - The input type for the queryVectorDatabaseAndGenerateResponse function.
  * - QueryVectorDatabaseAndGenerateResponseOutput - The return type for the queryVectordatabaseAndGenerateResponse function.
  */
 
-import { genkit } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 import { z } from 'zod';
 
 const QueryVectorDatabaseAndGenerateResponseInputSchema = z.object({
@@ -25,20 +23,9 @@ const QueryVectorDatabaseAndGenerateResponseOutputSchema = z.object({
 });
 export type QueryVectorDatabaseAndGenerateResponseOutput = z.infer<typeof QueryVectorDatabaseAndGenerateResponseOutputSchema>;
 
+
 export async function queryVectorDatabaseAndGenerateResponse(input: QueryVectorDatabaseAndGenerateResponseInput): Promise<QueryVectorDatabaseAndGenerateResponseOutput> {
-  const ai = genkit({
-    plugins: [
-      googleAI({
-        apiKey: input.apiKey,
-      }),
-    ],
-  });
-
-  const primaryModelName = input.model.startsWith('gemini')
-    ? `googleai/${input.model}`
-    : 'googleai/gemini-pro';
-
-  const fallbackModelName = 'googleai/gemini-pro';
+  const modelName = input.model || 'gemini-pro';
 
   const prompt = `You are a helpful AI assistant that answers questions based on the provided document excerpts.
 
@@ -50,33 +37,45 @@ ${input.fileContents.join('\n---\n')}
 
 Question: ${input.query}`;
 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+
   try {
-    const { output } = await ai.generate({
-      prompt: prompt,
-      model: primaryModelName,
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': input.apiKey,
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      })
     });
 
-    if (!output || !output.text) {
-      throw new Error('AI failed to generate a response with the primary model.');
+    if (!response.ok) {
+        const errorBody = await response.json();
+        console.error('AI API Error:', errorBody);
+        const errorMessage = errorBody?.error?.message || 'The AI service returned an error.';
+        throw new Error(`AI API request failed: ${response.status} ${response.statusText} - ${errorMessage}`);
     }
-    return { response: output.text };
-  } catch (error: any) {
-    // If the primary model fails (e.g., due to overload), try the fallback.
-    console.warn(`Primary model '${primaryModelName}' failed: ${error.message}. Retrying with fallback model '${fallbackModelName}'.`);
-    
-    try {
-        const { output } = await ai.generate({
-            prompt: prompt,
-            model: fallbackModelName,
-        });
 
-        if (!output || !output.text) {
-            throw new Error('AI failed to generate a response with the fallback model.');
-        }
-        return { response: output.text };
-    } catch (fallbackError) {
-        console.error('Fallback model also failed:', fallbackError);
-        throw new Error('AI failed to generate a response with both primary and fallback models.');
+    const responseData = await response.json();
+    
+    const text = responseData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      console.error('Invalid response structure from AI:', responseData);
+      throw new Error('AI failed to generate a valid response structure.');
     }
+
+    return { response: text };
+
+  } catch (error) {
+    console.error('Failed to call AI model:', error);
+    if (error instanceof Error) {
+        throw new Error(`AI failed to generate a response: ${error.message}`);
+    }
+    throw new Error('An unknown error occurred while communicating with the AI model.');
   }
 }

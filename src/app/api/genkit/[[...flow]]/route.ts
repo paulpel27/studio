@@ -1,4 +1,5 @@
 import { createNextHandler } from '@genkit-ai/next';
+import '@/ai/genkit';
 import '@/ai/flows/query-vector-database-and-generate-response';
 
 
