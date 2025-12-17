@@ -133,7 +133,7 @@ export function FileUploader() {
           <p className="mt-4 font-semibold">
             {isDragActive ? 'Drop the files here...' : 'Drag & drop files here, or click to select'}
           </p>
-          <p className="text-sm text-muted-foreground">PDF only, up to {MAX_FILE_SIZE_MB}MB</p>
+          <p className="text-sm text-muted-foreground">PDF only, up to ${MAX_FILE_SIZE_MB}MB</p>
         </div>
       )}
     </div>
