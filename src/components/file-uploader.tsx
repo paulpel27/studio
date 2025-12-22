@@ -12,7 +12,7 @@ import { Progress } from '@/components/ui/progress';
 // Set up the worker source for pdf.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
-type ProcessStep = 'idle' | 'extracting' | 'chunking' | 'embedding' | 'done' | 'error';
+type ProcessStep = 'idle' | 'extracting' | 'chunking' | 'saving' | 'done' | 'error';
 interface FileStatus {
   file: File;
   status: ProcessStep;
@@ -28,27 +28,55 @@ async function extractTextFromPdf(file: File, onProgress: (percent: number) => v
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
+      // Instead of just joining with spaces, we can be a bit smarter
+      // to preserve some structure, though perfect structure is very hard.
       const pageText = textContent.items.map(item => ('str' in item ? item.str : '')).join(' ');
-      fullText += pageText + '\n\n';
+      fullText += pageText + '\n'; // Add a newline after each page's content
       onProgress(Math.round((i / pdf.numPages) * 100));
     }
   
     return fullText;
 }
 
-function chunkText(text: string, chunkSize: number = 1500, overlap: number = 200): string[] {
-    const chunks: string[] = [];
-    if (!text) return chunks;
+/**
+ * Splits text into sentences and then groups them into chunks.
+ * This is more "content-aware" than simply slicing the text,
+ * as it avoids splitting in the middle of a sentence.
+ */
+function chunkText(text: string, targetChunkSize: number = 1500, overlap: number = 200): string[] {
+    if (!text) return [];
 
-    let i = 0;
-    while (i < text.length) {
-      const end = i + chunkSize;
-      chunks.push(text.slice(i, end));
-      i = end - overlap;
-      if (end >= text.length) {
-        break;
-      }
+    // Split the text into sentences. This is a simple regex and might not be perfect for all cases.
+    const sentences = text.split(/(?<=[.?!])\s+/);
+    const chunks: string[] = [];
+    
+    let currentChunk = "";
+    for (let i = 0; i < sentences.length; i++) {
+        const sentence = sentences[i];
+        if (currentChunk.length + sentence.length > targetChunkSize && currentChunk) {
+            chunks.push(currentChunk);
+            
+            // Handle overlap by finding where to start the next chunk
+            const lastSentences = currentChunk.split(/(?<=[.?!])\s+/);
+            let overlapText = "";
+            let overlapLength = 0;
+            for(let j = lastSentences.length - 1; j >= 0; j--) {
+                if (overlapLength + lastSentences[j].length < overlap) {
+                    overlapLength += lastSentences[j].length;
+                    overlapText = lastSentences[j] + " " + overlapText;
+                } else {
+                    break;
+                }
+            }
+            currentChunk = overlapText;
+        }
+        currentChunk += sentence + " ";
     }
+
+    if (currentChunk) {
+        chunks.push(currentChunk);
+    }
+    
     return chunks;
 }
 
@@ -77,22 +105,22 @@ export function FileUploader() {
         return; // Stop processing this file
     }
 
-    // Artificial delay to simulate careful processing
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Artificial delay for UI feedback
+    await new Promise(resolve => setTimeout(resolve, 300));
 
     // 2. Chunking
-    updateFileStatus(file.name, { status: 'chunking', progress: 0, message: 'Chunking document...' });
+    updateFileStatus(file.name, { status: 'chunking', progress: 0, message: 'Chunking content...' });
     const textChunks = chunkText(rawText);
     // Simulate chunking progress
     for (let i = 0; i <= 100; i+= 50) {
         updateFileStatus(file.name, { progress: i });
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 150));
     }
     updateFileStatus(file.name, { progress: 100 });
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    // 3. "Embedding" / Saving
-    updateFileStatus(file.name, { status: 'embedding', progress: 50, message: 'Adding to knowledge base...' });
+    // 3. Saving to state
+    updateFileStatus(file.name, { status: 'saving', progress: 50, message: 'Saving to knowledge base...' });
     dispatch({
       type: 'ADD_FILE',
       payload: {
@@ -101,7 +129,7 @@ export function FileUploader() {
         textChunks: textChunks,
       },
     });
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
     updateFileStatus(file.name, { status: 'done', progress: 100, message: 'Complete' });
 
     toast({
@@ -131,6 +159,14 @@ export function FileUploader() {
                 });
                 return false;
             }
+            if (state.files.some(f => f.name === file.name)) {
+                toast({
+                    variant: 'destructive',
+                    title: 'File already exists',
+                    description: `"${file.name}" is already in the knowledge base.`,
+                });
+                return false;
+            }
             return true;
         })
         .map(file => ({ file, status: 'idle', progress: 0, message: 'Queued' }));
@@ -141,7 +177,7 @@ export function FileUploader() {
         await processFile(status.file);
     }
 
-  }, [dispatch, toast, state.settings.apiKey, state.settings.model]);
+  }, [dispatch, toast, state.settings.apiKey, state.settings.model, state.files]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -183,7 +219,7 @@ export function FileUploader() {
                             <p className="truncate font-medium">{file.name}</p>
                             <Progress value={progress} className="h-2 mt-1" />
                         </div>
-                        <p className="w-36 shrink-0 text-right text-muted-foreground">{message}</p>
+                        <p className="w-40 shrink-0 text-right text-muted-foreground">{message}</p>
                     </div>
                 ))}
             </div>
