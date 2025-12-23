@@ -1,34 +1,21 @@
 {
-  "name": "RagInfo",
+  "name": "RagInfo: AI-Powered Document Chat",
   "short_name": "RagInfo",
-  "description": "RAGInfo
-This application allows you to have conversations with your PDF documents. It uses a Retrieval-Augmented Generation (RAG) architecture powered by large language models to provide answers based on the content of the files you upload.
-How to Use the App
-    1. Configure your API Key: Navigate to the Settings page. Enter your Google AI API Key and select an AI model. Your key is encrypted and stored securely in your browser's local storage.
-    2. Upload Documents: Go to the Files page. Drag and drop your PDF files into the upload area or click to select them. The app will process each file, extract the text, and add it to its knowledge base.
-    3. Start Chatting: Head over to the Chat page. You can now ask questions related to the content of your uploaded documents.
-    4. Manage Files: You can delete uploaded files from the Files page at any time. Deleting a file removes it from the AI's knowledge base.
-    5. Import/Export Data: On the Settings page, you can export all your application data (including uploaded file content and your settings) to a single JSON file for backup. You can also import this file to restore your data on another device or browser.
-",
+  "description": "Chat with your PDF documents using the power of AI.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1f2937",
+  "background_color": "#ffffff",
   "theme_color": "#334185",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTEuNSA4SDh2My41Ii8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSI0IiB5PSI4IiByeD0iMiIvPjxwYXRoIGQ9Ik0yIDE0aDIiLz48cGF0aCBkPSJNMjAgMTRoMiIvPjxwYXRoIGQ9Ik0xNSAxM3YyIi8+PHBhdGggZD0iTTkgMTN2MiIvPjwvc3ZnPg==",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "https://picsum.photos/seed/raginfo192/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "https://picsum.photos/seed/picsum/192/192",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "https://picsum.photos/seed/picsum/512/512",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "https://picsum.photos/seed/raginfo512/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }

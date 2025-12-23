@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 const metadata: Metadata = {
   title: 'RagInfo',
   description: 'AI-powered chat with your documents.',
-  manifest: '/manifest.webmanifest',
+  manifest: '/manifest.json',
 };
 
 
@@ -43,7 +43,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="theme-color" content="#334185" />
-        <link rel="manifest" href="/manifest.webmanifest" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-body antialiased">
         <AppProvider>
