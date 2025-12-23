@@ -1,5 +1,7 @@
 import { SettingsForm } from '@/components/settings-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function SettingsPage() {
   return (
@@ -15,8 +17,20 @@ export default function SettingsPage() {
             Your key is stored securely in your browser's local storage.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           <SettingsForm />
+           <div className="rounded-lg border border-border bg-card p-4">
+              <h4 className="mb-2 font-semibold">How to get a free API Key</h4>
+              <p className="text-sm text-muted-foreground">
+                You can get a free Google AI API key for development from Google AI Studio.
+                It provides a generous free tier to get you started.
+              </p>
+              <Button asChild variant="link" className="px-0">
+                <Link href="https://aistudio.google.com/app/apikey" target="_blank">
+                    Get an API Key from Google AI Studio
+                </Link>
+              </Button>
+            </div>
         </CardContent>
       </Card>
     </div>
