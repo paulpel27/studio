@@ -6,7 +6,15 @@
   "start_url": "/",
   "name": "RagInfo",
   "short_name": "RagInfo",
-  "description": "AI-powered chat with your documents.",
+  "description": "RAGInfo
+This application allows you to have conversations with your PDF documents. It uses a Retrieval-Augmented Generation (RAG) architecture powered by large language models to provide answers based on the content of the files you upload.
+How to Use the App
+    1. Configure your API Key: Navigate to the Settings page. Enter your Google AI API Key and select an AI model. Your key is encrypted and stored securely in your browser's local storage.
+    2. Upload Documents: Go to the Files page. Drag and drop your PDF files into the upload area or click to select them. The app will process each file, extract the text, and add it to its knowledge base.
+    3. Start Chatting: Head over to the Chat page. You can now ask questions related to the content of your uploaded documents.
+    4. Manage Files: You can delete uploaded files from the Files page at any time. Deleting a file removes it from the AI's knowledge base.
+    5. Import/Export Data: On the Settings page, you can export all your application data (including uploaded file content and your settings) to a single JSON file for backup. You can also import this file to restore your data on another device or browser.
+",
   "icons": [
     {
       "src": "https://picsum.photos/seed/1/192/192",
