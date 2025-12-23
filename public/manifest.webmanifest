@@ -1,0 +1,26 @@
+{
+    "name": "RagInfo",
+    "short_name": "RagInfo",
+    "description": "AI-powered chat with your documents.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#E0F7FA",
+    "theme_color": "#224292",
+    "icons": [
+        {
+            "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyMjQyOTIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgOFY0SDgiIC8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSI0IiB5PSI4IiByeD0iMiIgLz48cGF0aCBkPSJNMCAxNGgyIiAvPjxwYXRoIGQ9Ik0yMCAxNGgyIiAvPjxwYXRoIGQ9Ik0xNSAxM3YyIiAvPjxwYXRoIGQ9Ik05IDEzdiYyIiAvPjwvc3ZnPg==",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "https://placehold.co/192x192/224292/E0F7FA?text=RI",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://placehold.co/512x512/224292/E0F7FA?text=RI",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
