@@ -1,19 +1,19 @@
 {
-  "name": "RagInfo",
+  "name": "RagInfo - Chat with your Documents",
   "short_name": "RagInfo",
   "description": "AI-powered chat with your documents.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f0f9ff",
-  "theme_color": "#3b82f6",
+  "background_color": "#e0f2f7",
+  "theme_color": "#334185",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8' /%3E%3Crect width='16' height='12' x='4' y='8' rx='2' /%3E%3Cpath d='M2 14h2' /%3E%3Cpath d='M20 14h2' /%3E%3Cpath d='M15 13v2' /%3E%3Cpath d='M9 13v2' /%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334185' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8' /%3E%3Crect width='16' height='12' x='4' y='8' rx='2' /%3E%3Cpath d='M2 14h2' /%3E%3Cpath d='M20 14h2' /%3E%3Cpath d='M15 13v2' /%3E%3Cpath d='M9 13v2' /%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334185' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E",
       "sizes": "512x512",
       "type": "image/svg+xml"
     }
