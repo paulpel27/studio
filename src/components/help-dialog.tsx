@@ -52,9 +52,19 @@ export function HelpDialog({ children }: HelpDialogProps) {
                         <li>
                             <strong className="font-medium text-foreground">Manage Files:</strong> You can delete uploaded files from the <code className="bg-muted px-1 py-0.5 rounded">Files</code> page at any time. Deleting a file removes it from the AI&apos;s knowledge base.
                         </li>
+                        <li>
+                            <strong className="font-medium text-foreground">Import/Export Data:</strong> On the <code className="bg-muted px-1 py-0.5 rounded">Settings</code> page, you can export all your application data (including uploaded file content and your settings) to a single JSON file for backup. You can also import this file to restore your data on another device or browser.
+                        </li>
                     </ol>
                 </section>
                 
+                <section>
+                    <h3 className="font-semibold text-lg text-foreground mb-2">Install as an App</h3>
+                    <p>
+                        For easier access, you can install RagInfo as an application on your computer or mobile device. Look for the install icon in your browser&apos;s address bar. This allows you to launch the app directly from your home screen or desktop.
+                    </p>
+                </section>
+
                 <section>
                     <h3 className="font-semibold text-lg text-foreground mb-2">Disclaimer</h3>
                     <p>
