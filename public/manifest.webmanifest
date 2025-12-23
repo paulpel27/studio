@@ -8,19 +8,20 @@
   "theme_color": "#334185",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    },
-    {
       "src": "https://picsum.photos/seed/1/192/192",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://picsum.photos/seed/1/512/512",
+      "src": "https://picsum.photos/seed/2/512/512",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23334185' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M12 8V4H8'/%3e%3crect width='16' height='12' x='4' y='8' rx='2'/%3e%3cpath d='M2 14h2'/%3e%3cpath d='M20 14h2'/%3e%3cpath d='M15 13v2'/%3e%3cpath d='M9 13v2'/%3e%3c/svg%3e",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
