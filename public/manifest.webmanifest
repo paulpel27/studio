@@ -1,26 +1,26 @@
 {
-    "name": "RagInfo",
-    "short_name": "RagInfo",
-    "description": "AI-powered chat with your documents.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#E0F7FA",
-    "theme_color": "#224292",
-    "icons": [
-        {
-            "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyMjQyOTIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgOFY0SDgiIC8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSI0IiB5PSI4IiByeD0iMiIgLz48cGF0aCBkPSJNMCAxNGgyIiAvPjxwYXRoIGQ9Ik0yMCAxNGgyIiAvPjxwYXRoIGQ9Ik0xNSAxM3YyIiAvPjxwYXRoIGQ9Ik05IDEzdiYyIiAvPjwvc3ZnPg==",
-            "sizes": "any",
-            "type": "image/svg+xml"
-        },
-        {
-            "src": "https://placehold.co/192x192/224292/E0F7FA?text=RI",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "https://placehold.co/512x512/224292/E0F7FA?text=RI",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "RagInfo",
+  "short_name": "RagInfo",
+  "description": "AI-powered chat with your documents.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#334185",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://picsum.photos/seed/1/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/seed/1/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
