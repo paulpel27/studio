@@ -1,26 +1,26 @@
 {
-    "name": "RagInfo - AI Chat with your Docs",
-    "short_name": "RagInfo",
-    "description": "An application that allows you to have conversations with your PDF documents using AI.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#334185",
-    "icons": [
-        {
-            "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23334185' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8V4H8'/%3E%3Crect width='16' height='12' x='4' y='8' rx='2'/%3E%3Cpath d='M2 14h2'/%3E%3Cpath d='M20 14h2'/%3E%3Cpath d='M15 13v2'/%3E%3Cpath d='M9 13v2'/%3E%3C/svg%3E",
-            "sizes": "any",
-            "type": "image/svg+xml"
-        },
-        {
-            "src": "https://placehold.co/192x192/a9b5f5/334185.png?text=Rag",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "https://placehold.co/512x512/a9b5f5/334185.png?text=Rag",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "RagInfo",
+  "short_name": "RagInfo",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#334185",
+  "description": "AI-powered chat with your documents.",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzQxODUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTEuNSA4SDhWNEg0Ii8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSIyIiB5PSI4IiByeD0iMiIvPjxwYXRoIGQ9Ik0wIDE0aDIiLz48cGF0aCBkPSJNMjIgMTRoMiIvPjxwYXRoIGQ9Ik0xNyAxM3YyIi8+PHBhdGggZD0iTTcgMTN2MiIvPjwvc3ZnPg==",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://placehold.co/192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://placehold.co/512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
