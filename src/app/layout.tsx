@@ -7,6 +7,7 @@ import { LayoutShell } from '@/components/layout-shell';
 export const metadata: Metadata = {
   title: 'RagInfo',
   description: 'AI-powered chat with your documents.',
+  manifest: '/manifest.webmanifest',
 };
 
 export default function RootLayout({
