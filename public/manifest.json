@@ -1,26 +1,26 @@
 {
   "name": "RagInfo",
   "short_name": "RagInfo",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#334185",
   "description": "AI-powered chat with your documents.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f2937",
+  "theme_color": "#334185",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzQxODUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTEuNSA4SDhWNEg0Ii8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSIyIiB5PSI4IiByeD0iMiIvPjxwYXRoIGQ9Ik0wIDE0aDIiLz48cGF0aCBkPSJNMjIgMTRoMiIvPjxwYXRoIGQ9Ik0xNyAxM3YyIi8+PHBhdGggZD0iTTcgMTN2MiIvPjwvc3ZnPg==",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTEuNSA4SDh2My41Ii8+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEyIiB4PSI0IiB5PSI4IiByeD0iMiIvPjxwYXRoIGQ9Ik0yIDE0aDIiLz48cGF0aCBkPSJNMjAgMTRoMiIvPjxwYXRoIGQ9Ik0xNSAxM3YyIi8+PHBhdGggZD0iTTkgMTN2MiIvPjwvc3ZnPg==",
       "sizes": "any",
       "type": "image/svg+xml"
     },
     {
-      "src": "https://placehold.co/192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "https://picsum.photos/seed/picsum/192/192",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "https://placehold.co/512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "https://picsum.photos/seed/picsum/512/512",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ]
 }
