@@ -14,6 +14,7 @@ interface AppState {
 type Action =
   | { type: 'ADD_FILE'; payload: AppFile }
   | { type: 'DELETE_FILE'; payload: { id: string } }
+  | { type: 'SET_FILES'; payload: AppFile[] }
   | { type: 'ADD_CHAT'; payload: Chat }
   | { type: 'DELETE_CHAT'; payload: { id: string } }
   | { type: 'UPDATE_SETTINGS'; payload: AppSettings }
@@ -27,6 +28,8 @@ const appReducer = (state: AppState, action: Action): AppState => {
       return { ...state, files: [...state.files, action.payload] };
     case 'DELETE_FILE':
       return { ...state, files: state.files.filter(file => file.id !== action.payload.id) };
+    case 'SET_FILES':
+      return { ...state, files: action.payload };
     case 'ADD_CHAT':
       return { ...state, chats: [...state.chats, action.payload] };
     case 'DELETE_CHAT':
@@ -55,18 +58,27 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const item = window.localStorage.getItem('raginfo-state');
+        const item = window.localStorage.getItem('raginfo-data'); // Changed key
         if (item) {
-          const parsedState = JSON.parse(item) as AppState;
+          const parsedState = JSON.parse(item);
 
           // Decrypt the API key after loading
-          if (parsedState.settings.apiKey) {
+          if (parsedState.settings && parsedState.settings.apiKey) {
             decrypt(parsedState.settings.apiKey).then(decryptedKey => {
-              parsedState.settings.apiKey = decryptedKey;
-              dispatch({ type: 'SET_STATE', payload: parsedState });
+              const finalState: AppState = {
+                settings: { ...parsedState.settings, apiKey: decryptedKey },
+                files: parsedState.files || [],
+                chats: parsedState.chats || [],
+              }
+              dispatch({ type: 'SET_STATE', payload: finalState });
             });
           } else {
-             dispatch({ type: 'SET_STATE', payload: parsedState });
+             const finalState: AppState = {
+                settings: parsedState.settings || getInitialState().settings,
+                files: parsedState.files || [],
+                chats: parsedState.chats || [],
+             }
+             dispatch({ type: 'SET_STATE', payload: finalState });
           }
         }
       } catch (error) {
@@ -80,19 +92,24 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     if (typeof window !== 'undefined') {
       // Don't save initial empty state
       if (state.files.length === 0 && state.chats.length === 0 && !state.settings.apiKey) {
+        // Clear local storage if state is empty to prevent loading old data on refresh
+        if (localStorage.getItem('raginfo-data')) {
+            localStorage.removeItem('raginfo-data');
+        }
         return;
       }
-      // Encrypt the API key before saving
+      
       encrypt(state.settings.apiKey).then(encryptedKey => {
         const stateToSave = {
-          ...state,
           settings: {
             ...state.settings,
             apiKey: encryptedKey,
           },
+          files: state.files,
+          chats: state.chats,
         };
         try {
-          window.localStorage.setItem('raginfo-state', JSON.stringify(stateToSave));
+          window.localStorage.setItem('raginfo-data', JSON.stringify(stateToSave));
         } catch (error) {
           console.error('Error writing to localStorage', error);
         }

@@ -2,6 +2,7 @@ import { SettingsForm } from '@/components/settings-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 
 export default function SettingsPage() {
   return (
@@ -19,6 +20,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <SettingsForm />
+           <Separator />
            <div className="rounded-lg border border-border bg-card p-4">
               <h4 className="mb-2 font-semibold">How to get a free API Key</h4>
               <p className="text-sm text-muted-foreground">

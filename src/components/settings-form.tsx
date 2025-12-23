@@ -10,8 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, Download } from 'lucide-react';
+import { UploadCloud, Download, FileUp, FileDown } from 'lucide-react';
 import { decrypt, encrypt } from '@/lib/crypto';
+import type { AppFile, AppSettings } from '@/lib/types';
 
 const settingsSchema = z.object({
   apiKey: z.string().min(1, 'API Key is required.'),
@@ -19,6 +20,17 @@ const settingsSchema = z.object({
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
+
+const exportedDataSchema = z.object({
+    settings: settingsSchema,
+    files: z.array(z.object({
+        id: z.string(),
+        name: z.string(),
+        textChunks: z.array(z.string())
+    })),
+    chats: z.array(z.any()).optional(), // Keep chats flexible for now
+});
+
 
 export function SettingsForm() {
   const { state, dispatch } = useAppContext();
@@ -41,23 +53,25 @@ export function SettingsForm() {
         reader.onload = async (e) => {
           try {
             const text = e.target?.result as string;
-            const newSettings = JSON.parse(text);
-            
-            // Decrypt the API key if it's present
-            if (newSettings.apiKey) {
+            const importedData = JSON.parse(text);
+
+            const validatedData = exportedDataSchema.parse(importedData);
+
+            if (validatedData.settings.apiKey) {
                 try {
-                    newSettings.apiKey = await decrypt(newSettings.apiKey);
+                    validatedData.settings.apiKey = await decrypt(validatedData.settings.apiKey);
                 } catch (e) {
-                    // It might not be encrypted, so we use it as is.
+                    // It might not be encrypted, use as is.
                 }
             }
+            
+            // Dispatch actions to update state
+            dispatch({ type: 'UPDATE_SETTINGS', payload: validatedData.settings });
+            dispatch({ type: 'SET_FILES', payload: validatedData.files });
 
-            const validatedSettings = settingsSchema.parse(newSettings);
-            form.reset(validatedSettings);
-            dispatch({ type: 'UPDATE_SETTINGS', payload: validatedSettings });
             toast({
-              title: 'Settings Loaded',
-              description: 'Your settings have been loaded from the file.',
+              title: 'Data Loaded',
+              description: 'Your settings and files have been imported.',
             });
 
           } catch (error) {
@@ -65,14 +79,14 @@ export function SettingsForm() {
               variant: 'destructive',
               title: 'Invalid File',
               description:
-                'The uploaded file is not a valid JSON settings file or is corrupted.',
+                'The uploaded file is not a valid JSON data file or is corrupted.',
             });
           }
         };
         reader.readAsText(file);
       }
     },
-    [dispatch, form, toast]
+    [dispatch, toast]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -84,25 +98,29 @@ export function SettingsForm() {
   async function handleExport() {
     try {
         const encryptedKey = await encrypt(state.settings.apiKey);
-        const settingsToSave = { ...state.settings, apiKey: encryptedKey };
-        const blob = new Blob([JSON.stringify(settingsToSave, null, 2)], { type: 'application/json' });
+        const stateToSave = { 
+            settings: { ...state.settings, apiKey: encryptedKey },
+            files: state.files,
+            chats: state.chats
+        };
+        const blob = new Blob([JSON.stringify(stateToSave, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'raginfo-settings.json';
+        a.download = 'raginfo-data.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         toast({
-            title: 'Settings Exported',
-            description: 'Your settings have been saved to raginfo-settings.json',
+            title: 'Data Exported',
+            description: 'Your data has been saved to raginfo-data.json',
         });
     } catch (error) {
         toast({
             variant: 'destructive',
             title: 'Export Failed',
-            description: 'Could not export settings.',
+            description: 'Could not export your application data.',
         });
     }
   }
@@ -117,27 +135,8 @@ export function SettingsForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="grid w-full max-w-lg gap-8">
-          <div
-            {...getRootProps()}
-            className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed text-center transition-colors ${
-              isDragActive ? 'border-primary bg-accent/20' : 'border-border hover:border-primary/50'
-            }`}
-          >
-            <input {...getInputProps()} />
-            <div className="flex flex-col items-center">
-              <UploadCloud className="h-8 w-8 text-muted-foreground" />
-              <p className="mt-2 font-semibold">
-                {isDragActive
-                  ? 'Drop the settings file here...'
-                  : 'Drag & drop a settings file, or click to select'}
-              </p>
-              <p className="text-xs text-muted-foreground">Upload a JSON file to import settings.</p>
-            </div>
-          </div>
-
-          <div className="grid gap-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="grid w-full max-w-lg gap-6">
             <FormField
               control={form.control}
               name="apiKey"
@@ -164,14 +163,32 @@ export function SettingsForm() {
                 </FormItem>
               )}
             />
-            <div className="flex flex-col sm:flex-row gap-2">
-                <Button type="submit" className="flex-1">Save Settings</Button>
-                <Button type="button" variant="outline" className="flex-1" onClick={handleExport}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Export Settings
-                </Button>
-            </div>
+            <Button type="submit">Save Settings</Button>
           </div>
+        
+        <div className="grid w-full max-w-lg gap-8 pt-8">
+            <div
+                {...getRootProps()}
+                className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed text-center transition-colors ${
+                isDragActive ? 'border-primary bg-accent/20' : 'border-border hover:border-primary/50'
+                }`}
+            >
+                <input {...getInputProps()} />
+                <div className="flex flex-col items-center">
+                <FileUp className="h-8 w-8 text-muted-foreground" />
+                <p className="mt-2 font-semibold">
+                    {isDragActive
+                    ? 'Drop the data file here...'
+                    : 'Import Data'}
+                </p>
+                <p className="text-xs text-muted-foreground">Drag & drop a JSON file to restore your files and settings.</p>
+                </div>
+            </div>
+            
+            <Button type="button" variant="outline" onClick={handleExport}>
+                <FileDown className="mr-2 h-4 w-4" />
+                Export All Data
+            </Button>
         </div>
       </form>
     </Form>
