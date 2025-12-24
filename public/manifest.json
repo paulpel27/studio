@@ -1,7 +1,7 @@
 {
   "name": "RagInfo",
   "short_name": "RagInfo",
-  "description": "AI-powered chat with your documents.",
+  "description": "AI-powered super chat with your documents.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
