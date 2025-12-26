@@ -1,22 +1,22 @@
 {
-  "name": "RagInfo - AI Chat with Docs",
+  "name": "RagInfo",
   "short_name": "RagInfo",
-  "description": "An AI-powered application to chat with your documents.",
+  "description": "AI-powered chat with your documents.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#334185",
+  "background_color": "#E0F7FA",
+  "theme_color": "#224292",
   "icons": [
     {
-      "src": "https://placehold.co/192x192/334185/FFFFFF/png?text=R",
-      "sizes": "192x192",
+      "src": "/icons/icon192x192.png",
       "type": "image/png",
+      "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "https://placehold.co/512x512/334185/FFFFFF/png?text=R",
-      "sizes": "512x512",
+      "src": "/icons/icon512x512.png",
       "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any maskable"
     }
   ]
