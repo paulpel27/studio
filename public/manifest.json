@@ -1,7 +1,9 @@
 {
   "name": "RagInfo",
   "short_name": "RagInfo",
-  "description": "AI-powered super chat with your documents.",
+  "description": "This application allows you to have conversations with your PDF, DOCX, CSV, TXT or CSV documents. It uses a Retrieval-Augmented Generation (RAG) architecture powered by large language models to provide answers based on the content of the files you upload.
+So you can questions about all your uploaded documents of the described types with AI support.
+Please be aware that you have to use your own Google API key and select the Google model, but those are free and it is clearly explained how to get and use these items from Google for free.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
