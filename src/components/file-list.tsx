@@ -28,7 +28,7 @@ export function FileList() {
             <Info className="h-10 w-10 text-muted-foreground" />
             <h3 className="mt-4 text-lg font-semibold">No Files Uploaded</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-                Your knowledge base is empty. Upload a PDF to get started.
+                Your knowledge base is empty. Upload a file to get started.
             </p>
         </div>
     );

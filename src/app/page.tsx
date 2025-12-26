@@ -14,8 +14,8 @@ export default function FilesPage() {
       <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Upload PDF</CardTitle>
-            <CardDescription>Upload PDF files (max 10MB) to add them to the knowledge base.</CardDescription>
+            <CardTitle>Upload Files</CardTitle>
+            <CardDescription>Upload files (max 10MB) to add them to the knowledge base. Supported formats: PDF, DOCX, TXT, CSV.</CardDescription>
           </CardHeader>
           <CardContent>
             <FileUploader />

@@ -7,6 +7,7 @@ import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/hooks/use-toast';
 import { MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from '@/lib/constants';
 import * as pdfjsLib from 'pdfjs-dist';
+import * as mammoth from 'mammoth';
 import { Progress } from '@/components/ui/progress';
 
 // Set up the worker source for pdf.js
@@ -28,15 +29,30 @@ async function extractTextFromPdf(file: File, onProgress: (percent: number) => v
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
-      // Instead of just joining with spaces, we can be a bit smarter
-      // to preserve some structure, though perfect structure is very hard.
       const pageText = textContent.items.map(item => ('str' in item ? item.str : '')).join(' ');
-      fullText += pageText + '\n'; // Add a newline after each page's content
+      fullText += pageText + '\n';
       onProgress(Math.round((i / pdf.numPages) * 100));
     }
   
     return fullText;
 }
+
+async function extractTextFromDocx(file: File, onProgress: (percent: number) => void): Promise<string> {
+    onProgress(10);
+    const arrayBuffer = await file.arrayBuffer();
+    onProgress(50);
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    onProgress(100);
+    return result.value;
+}
+
+async function extractTextFromTxtOrCsv(file: File, onProgress: (percent: number) => void): Promise<string> {
+    onProgress(50);
+    const text = await file.text();
+    onProgress(100);
+    return text;
+}
+
 
 /**
  * Splits text into sentences and then groups them into chunks.
@@ -91,27 +107,31 @@ export function FileUploader() {
   };
   
   const processFile = async (file: File) => {
-    // 1. Extraction
     updateFileStatus(file.name, { status: 'extracting', progress: 0, message: 'Extracting text...' });
     let rawText = '';
     try {
-        rawText = await extractTextFromPdf(file, (progress) => {
-            updateFileStatus(file.name, { progress });
-        });
+        const onProgress = (progress: number) => updateFileStatus(file.name, { progress });
+
+        if (file.type === 'application/pdf') {
+            rawText = await extractTextFromPdf(file, onProgress);
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            rawText = await extractTextFromDocx(file, onProgress);
+        } else if (file.type === 'text/plain' || file.type === 'text/csv') {
+            rawText = await extractTextFromTxtOrCsv(file, onProgress);
+        } else {
+            throw new Error(`Unsupported file type: ${file.type}`);
+        }
         updateFileStatus(file.name, { progress: 100 });
     } catch (error) {
         console.error('Extraction Failed:', error);
         updateFileStatus(file.name, { status: 'error', message: 'Failed to extract text.' });
-        return; // Stop processing this file
+        return;
     }
 
-    // Artificial delay for UI feedback
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    // 2. Chunking
     updateFileStatus(file.name, { status: 'chunking', progress: 0, message: 'Chunking content...' });
     const textChunks = chunkText(rawText);
-    // Simulate chunking progress
     for (let i = 0; i <= 100; i+= 50) {
         updateFileStatus(file.name, { progress: i });
         await new Promise(resolve => setTimeout(resolve, 150));
@@ -119,8 +139,7 @@ export function FileUploader() {
     updateFileStatus(file.name, { progress: 100 });
     await new Promise(resolve => setTimeout(resolve, 300));
 
-    // 3. Saving to state
-    updateFileStatus(file.name, { status: 'saving', progress: 50, message: 'Saving to knowledge base...' });
+    updateFileStatus(file.name, { status: 'saving', progress: 50, message: 'Saving...' });
     dispatch({
       type: 'ADD_FILE',
       payload: {
@@ -181,7 +200,12 @@ export function FileUploader() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'application/pdf': ['.pdf'] },
+    accept: { 
+        'application/pdf': ['.pdf'],
+        'text/plain': ['.txt'],
+        'text/csv': ['.csv'],
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
+    },
     multiple: true,
   });
   
@@ -201,7 +225,7 @@ export function FileUploader() {
                 <p className="mt-4 font-semibold">
                     {isDragActive ? 'Drop the files here...' : 'Drag & drop files here, or click to select'}
                 </p>
-                <p className="text-sm text-muted-foreground">PDF only, up to {MAX_FILE_SIZE_MB}MB</p>
+                <p className="text-sm text-muted-foreground">PDF, DOCX, TXT, CSV (up to {MAX_FILE_SIZE_MB}MB)</p>
             </div>
         </div>
 
